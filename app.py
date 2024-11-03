@@ -77,6 +77,28 @@ def form():
             previsao_texto = 'Não tenho motivação'
             previsao = f'A IA preveu que sua motivação será: {previsao_texto}'
 
+        # <-- Chamando API para armazenar no MongoDB-->
+
+        url = "https://gats-educaeco-api-mongodb.onrender.com/api/resultados/adicionar"
+        dados = {
+            "nome": respostas["nome"],
+            "email": respostas["email"],
+            "resultado": previsao_texto
+        }
+
+        urllib3.disable_warnings()
+
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(url, json=dados, headers=headers, verify=False)
+
+        if response.status_code == 200:  # Sucesso de criação
+            print("Requisição bem-sucedida:", response.json())
+        else:
+            print(f"Erro: {response.status_code}")
+            print("Detalhes do erro:", response.text)
+
+        # <-- Fim chamada de API -->
+
         # Renderizar resultado
         return render_template("result.html", nome=respostas["nome"], predicao=previsao)
     return render_template("form.html")
