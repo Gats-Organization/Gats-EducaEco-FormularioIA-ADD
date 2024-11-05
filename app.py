@@ -7,13 +7,13 @@ import urllib3
 app = Flask(__name__)
 
 # Desserialização do preprocessador
-preprocessador_caminho = r'C:\Users\murilomoreira-ieg\OneDrive - Instituto Germinare\Área de trabalho\Trabalho Interdisciplinar 2°ano\Análise de Dados\Formulario IA\preprocessador.pkl'
+preprocessador_caminho = r'preprocessador.pkl'
 
 with open(preprocessador_caminho, 'rb') as file:
     preprocessador_desserializado = pkl.load(file)
 
 # Desserialização do model
-model_caminho = r'C:\Users\murilomoreira-ieg\OneDrive - Instituto Germinare\Área de trabalho\Trabalho Interdisciplinar 2°ano\Análise de Dados\Formulario IA\model.pkl'
+model_caminho = r'model.pkl'
 
 with open(model_caminho, 'rb') as file:
     model_desserializado = pkl.load(file)
@@ -72,14 +72,17 @@ def form():
 
         if previsao == 0:
             previsao_texto = 'Estudantil'
-            previsao = f'A IA preveu que sua motivação será: {previsao_texto}'
+            previsao = f'{previsao_texto}'
         else:
             previsao_texto = 'Não tenho motivação'
-            previsao = f'A IA preveu que sua motivação será: {previsao_texto}'
+            previsao = f'{previsao_texto}'
 
         # <-- Chamando API para armazenar no MongoDB-->
 
+        # URL da API
         url = "https://gats-educaeco-api-mongodb.onrender.com/api/resultados/adicionar"
+
+        # Dados para armazenar no MongoDB
         dados = {
             "nome": respostas["nome"],
             "email": respostas["email"],
@@ -89,8 +92,11 @@ def form():
         urllib3.disable_warnings()
 
         headers = {'Content-Type': 'application/json'}
+
+        # Armazenando os dados na API
         response = requests.post(url, json=dados, headers=headers, verify=False)
 
+        # Verificação para ver se o status da API deu 200
         if response.status_code == 200:  # Sucesso de criação
             print("Requisição bem-sucedida:", response.json())
         else:
@@ -104,6 +110,6 @@ def form():
     return render_template("form.html")
 
 if __name__ == "__main__":
-   app.run(debug=True)
+   app.run(debug=True, port = 5000, host = '0.0.0.0')
 
 
